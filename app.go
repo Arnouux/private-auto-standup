@@ -3,17 +3,16 @@ package main
 import (
     "fmt"
     "os/exec"
+    "bufio"
+    "strings"
 )
 
 func main() {
-    app := "echo"
+    app := "git"
 
-    arg0 := "-e"
-    arg1 := "Hello world"
-    arg2 := "\n\tfrom"
-    arg3 := "golang"
+    arg0 := "show"
 
-    cmd := exec.Command(app, arg0, arg1, arg2, arg3)
+    cmd := exec.Command(app, arg0)
     stdout, err := cmd.Output()
 
     if err != nil {
@@ -22,5 +21,20 @@ func main() {
     }
 
     // Print the output
-    fmt.Println(string(stdout))
+    scanner := bufio.NewScanner(strings.NewReader(string(stdout)))
+    dataSaved := ""
+    savingData := false
+    for scanner.Scan() {
+        if(strings.HasPrefix(scanner.Text(), "Date")) {
+            savingData = true
+            fmt.Println(scanner.Text())
+        }
+        if (savingData) {
+            dataSaved += scanner.Text()
+        }
+    }
+
+    fmt.Println(dataSaved)
+    
+    // git diff .
 }
