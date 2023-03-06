@@ -25,12 +25,17 @@ func main() {
     dataSaved := ""
     savingData := false
     for scanner.Scan() {
-        if(strings.HasPrefix(scanner.Text(), "Date")) {
+        line := scanner.Text()
+        if(strings.HasPrefix(line, "Date")) {
+            scanner.Scan()
+            scanner.Scan()
+            line = scanner.Text()
+            dataSaved += "Objective of this commit" + line + "\n"
             savingData = true
-            fmt.Println(scanner.Text())
         }
-        if (savingData) {
-            dataSaved += scanner.Text()
+
+        if (savingData && len(line) > 1 && (line[0] == '+' || line[0] == '-')) {
+            dataSaved += line + "\n"
         }
     }
 
