@@ -11,29 +11,26 @@ import (
 func main() {
     app := "git"
 
+
+    // git log --after="date today-1"
+    untilYesterday := time.Now().Add(time.Duration(-1) * time.Hour * 24)
     arg0 := "log"
-    arg1 := "--date=format:'%Y-%m-%d'"
+    arg1 := "--after=" + fmt.Sprintf("%d-%d-%d", untilYesterday.Year(), untilYesterday.Month(), untilYesterday.Day())
     cmd := exec.Command(app, arg0, arg1)
     stdout, err := cmd.Output()
     if err != nil {
         fmt.Println(err.Error())
         return
     }
+    commits := make([]string, 0)
     scanner := bufio.NewScanner(strings.NewReader(string(stdout)))
-    commit, _, _ := "", "", ""
     for scanner.Scan() {
         line := scanner.Text()
         if(strings.HasPrefix(line, "commit")) {
-            commit = line[7:13]
-        }
-        if(strings.HasPrefix(line, "Date")) {
-            date, _ := time.Parse("yyyy-mm-dd", line[8:])
-            fmt.Println(date)
-            fmt.Println(line[8:])
+            commits = append(commits, line[7:13])
         }
     }
-    fmt.Println(commit)
-
+    fmt.Printf("%v", commits)
 
     arg0 = "show"
     cmd = exec.Command(app, arg0)
@@ -43,7 +40,6 @@ func main() {
         return
     }
 
-    // Print the output
     scanner = bufio.NewScanner(strings.NewReader(string(stdout)))
     dataSaved := ""
     savingData := false
@@ -62,7 +58,7 @@ func main() {
         }
     }
 
-    dataSaved += "Above this are the commits of yesterday\nBelow is the work in progress:\n"
+    dataSaved += "\nAbove this are the commits of yesterday\nBelow is the work in progress:\n"
     
     // git diff .
     arg0 = "diff"
@@ -74,7 +70,6 @@ func main() {
         return
     }
 
-    // Print the output
     scanner = bufio.NewScanner(strings.NewReader(string(stdout)))
     savingData = false
     for scanner.Scan() {
