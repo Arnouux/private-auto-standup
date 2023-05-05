@@ -11,7 +11,6 @@ import (
 func main() {
     app := "git"
 
-
     // git log --after="date today-1"
     untilYesterday := time.Now().Add(time.Duration(-1) * time.Hour * 24)
     arg0 := "log"
@@ -32,30 +31,35 @@ func main() {
     }
     fmt.Printf("%v", commits)
 
-    arg0 = "show"
-    cmd = exec.Command(app, arg0)
-    stdout, err = cmd.Output()
-    if err != nil {
-        fmt.Println(err.Error())
-        return
-    }
-
-    scanner = bufio.NewScanner(strings.NewReader(string(stdout)))
     dataSaved := ""
-    savingData := false
-    for scanner.Scan() {
-        line := scanner.Text()
-        if(strings.HasPrefix(line, "Date")) {
-            scanner.Scan()
-            scanner.Scan()
-            line = scanner.Text()
-            dataSaved += "Objective of this commit:" + line + "\n"
-            savingData = true
-        }
 
-        if (savingData && len(line) > 1 && (line[0] == '+' || line[0] == '-')) {
-            dataSaved += line + "\n"
+    arg0 = "show"
+    for _, commit := range commits {
+        arg1 = commit
+        cmd = exec.Command(app, arg0)
+        stdout, err = cmd.Output()
+        if err != nil {
+            fmt.Println(err.Error())
+            return
         }
+    
+        scanner = bufio.NewScanner(strings.NewReader(string(stdout)))
+        savingData := false
+        for scanner.Scan() {
+            line := scanner.Text()
+            if(strings.HasPrefix(line, "Date")) {
+                scanner.Scan()
+                scanner.Scan()
+                line = scanner.Text()
+                dataSaved += "Objective of this commit:" + line + "\n"
+                savingData = true
+            }
+    
+            if (savingData && len(line) > 1 && (line[0] == '+' || line[0] == '-')) {
+                dataSaved += line + "\n"
+            }
+        }
+    
     }
 
     dataSaved += "\nAbove this are the commits of yesterday\nBelow is the work in progress:\n"
@@ -71,7 +75,6 @@ func main() {
     }
 
     scanner = bufio.NewScanner(strings.NewReader(string(stdout)))
-    savingData = false
     for scanner.Scan() {
         line := scanner.Text()
 
