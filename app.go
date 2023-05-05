@@ -6,6 +6,7 @@ import (
     "bufio"
     "strings"
     "time"
+    "strconv"
 )
 
 func main() {
@@ -29,12 +30,11 @@ func main() {
             commits = append(commits, line[7:13])
         }
     }
-    fmt.Printf("%v", commits)
 
     dataSaved := ""
 
     arg0 = "show"
-    for _, commit := range commits {
+    for i, commit := range commits {
         arg1 = commit
         cmd = exec.Command(app, arg0)
         stdout, err = cmd.Output()
@@ -51,7 +51,7 @@ func main() {
                 scanner.Scan()
                 scanner.Scan()
                 line = scanner.Text()
-                dataSaved += "Objective of this commit:" + line + "\n"
+                dataSaved += "Objective of commit " + strconv.Itoa(i) + ": " + line + "\n"
                 savingData = true
             }
     
