@@ -83,5 +83,9 @@ func main() {
         }
     }
 
+    dataSaved += "Explain how the commits of yesterday have changed the code and then explain the current work in progress (refer to commits and current work separately only). Only focus on lines starting with '+' (for added code) and '-' (for removed code)"
+
     fmt.Println(dataSaved)
+
+    // todo send to gpt api
 }
