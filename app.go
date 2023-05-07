@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "fmt"
     "os/exec"
     "bufio"
@@ -87,5 +88,12 @@ func main() {
 
     fmt.Println(dataSaved)
 
+    key, err := os.ReadFile("api.key")
+    if err != nil {
+        errorShown := fmt.Sprintf("Could not retrieve API key from file: %s", err)
+        panic(errorShown)
+    }
+
     // todo send to gpt api
+    fmt.Println(string(key))
 }
