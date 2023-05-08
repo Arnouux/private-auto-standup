@@ -3,12 +3,23 @@ package main
 import (
     "os"
     "fmt"
+    "encoding/json"
     "os/exec"
     "bufio"
     "strings"
     "time"
     "strconv"
 )
+
+type Message struct {
+    Role string         `json:"role"`
+    Content string      `json:"content"`
+}
+
+type PostData struct {
+    Model string        `json:"model"`
+    Messages []Message  `json:"messages"`
+}
 
 func main() {
     app := "git"
@@ -94,6 +105,22 @@ func main() {
         panic(errorShown)
     }
 
-    // todo send to gpt api
-    fmt.Println(string(key))
+    // what if > 3000 chars
+    fmt.Println(len(dataSaved))
+
+    message := Message {
+        Role: "user",
+        Content: dataSaved,
+    }
+
+    postData := PostData {
+        Model: "gpt-3.5-turbo",
+        Messages: []Message{message},
+    }
+
+    body, _ := json.Marshal(postData)
+
+    fmt.Println(body)
+
+    // todo send
 }
