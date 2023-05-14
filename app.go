@@ -3,12 +3,15 @@ package main
 import (
     "os"
     "fmt"
+    "bytes"
+    "net/http"
     "encoding/json"
     "os/exec"
     "bufio"
     "strings"
     "time"
     "strconv"
+    "io"
 )
 
 type Message struct {
@@ -101,9 +104,10 @@ func main() {
 
     key, err := os.ReadFile("api.key")
     if err != nil {
-        errorShown := fmt.Sprintf("Could not retrieve API key from file: %s", err)
-        panic(errorShown)
+        errorMsg := fmt.Sprintf("Could not retrieve API key from file: %s", err)
+        panic(errorMsg)
     }
+    keyString := "Bearer " + string(key)
 
     // what if > 3000 chars
     fmt.Println(len(dataSaved))
@@ -120,7 +124,24 @@ func main() {
 
     body, _ := json.Marshal(postData)
 
-    fmt.Println(body)
+    request, _ := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(body))
+    request.Header.Set("Content-Type", "application/json")
+    request.Header.Set("Authorization", keyString)
 
-    // todo send
+    client := &http.Client{}
+    response, err := client.Do(request)
+    if err != nil {
+        errorMsg := fmt.Sprintf("Could not send request to openai: %s", err)
+        panic(errorMsg)
+    }
+    defer response.Body.Close()
+
+    result, err := io.ReadAll(response.Body)
+    if err != nil {
+        errorMsg := fmt.Sprintf("Could not read response from openai: %s", err)
+        panic(errorMsg)
+    }
+
+    fmt.Println(string(result))
+
 }
